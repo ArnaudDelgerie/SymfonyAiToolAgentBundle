@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    ArnaudDelgerie\SymfonyAiToolAgent\:
+        resource: '../../'
+        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    ArnaudDelgerie\SymfonyAiToolAgent\Resolver\AiClientResolver:
+        arguments:
+            - !tagged_iterator 'symfony_ai_tool_agent.ai_client'
+
+    ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ToolFunctionResolver:
+        arguments:
+            - !tagged_iterator 'symfony_ai_tool_agent.tool_function_manager'
