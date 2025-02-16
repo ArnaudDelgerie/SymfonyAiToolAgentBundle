@@ -2,7 +2,7 @@
 
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Mistral;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunctionProperty;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -22,7 +22,7 @@ class MistralToolFunctionPropertyNormalizer implements NormalizerInterface
 
         if ($toolFunctionProperty->getType() === ToolFunctionPropertyTypeEnum::Object) {
             $normalizedToolFunctionProperty['additionalProperties'] = false;
-            $normalizedToolFunctionProperty['required'] = $toolFunctionProperty->getObjectRequiredProperties();
+            $normalizedToolFunctionProperty['required'] = $toolFunctionProperty->getObjectPropertiesName();
         }
 
         return $normalizedToolFunctionProperty;
@@ -30,7 +30,7 @@ class MistralToolFunctionPropertyNormalizer implements NormalizerInterface
 
     public function supportsNormalization($toolFunctionProperty, ?string $format = null, array $context = []): bool
     {
-        return $toolFunctionProperty instanceof ToolFunctionProperty && $context['clientEnum'] === AiClientEnum::Mistral;
+        return $toolFunctionProperty instanceof ToolFunctionProperty && $context['clientEnum'] === ClientEnum::Mistral;
     }
 
     public function getSupportedTypes(?string $format): array

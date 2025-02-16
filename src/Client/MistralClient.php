@@ -4,18 +4,18 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Client;
 
 use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\UsageReport;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentUsageReport;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientResponse;
 
 readonly class MistralClient extends AbstractClient
 {
-    public function getClientEnum(): AiClientEnum
+    public function getClientEnum(): ClientEnum
     {
-        return AiClientEnum::Mistral;
+        return ClientEnum::Mistral;
     }
 
-    public function chat(string $model, string $apiKey, array $messages, ?array $tools = [], ?float $temperature = 0.5, ?UsageReport &$usageReport = new UsageReport()): Message
+    public function chat(string $model, string $apiKey, array $messages, ?array $tools = [], ?float $temperature = 0.5, bool $onlyTool = true): ClientResponse
     {
         $client = HttpClient::create();
         $response = $client->request('POST', 'https://api.mistral.ai/v1/chat/completions', [
@@ -29,7 +29,7 @@ readonly class MistralClient extends AbstractClient
                 'temperature' => $temperature,
                 'messages' => $this->normalizeMessages($this->getClientEnum(), $messages),
                 'tools' => $this->normalizeTools($this->getClientEnum(), $tools),
-                'tool_choice' => 'any'
+                'tool_choice' => $onlyTool ? 'any' : 'auto'
             ],
         ]);
 
@@ -45,10 +45,9 @@ readonly class MistralClient extends AbstractClient
             throw new RuntimeException($response->getContent(false));
         }
 
-        $usageReport
-            ->addPromptTokens($response['usage']['prompt_tokens'])
-            ->addCompletionToken($response['usage']['completion_tokens']);
+        $message = $this->denormalizeMessage($this->getClientEnum(), $response['choices'][0]['message']);
+        $usageReport = new AgentUsageReport(1, $response['usage']['prompt_tokens'], $response['usage']['completion_tokens']);
 
-        return $this->denormalizeMessage($this->getClientEnum(), $response['choices'][0]['message']);
+        return new ClientResponse($message, $usageReport);
     }
 }

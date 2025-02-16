@@ -2,16 +2,16 @@
 
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Resolver;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\AiClientInterface;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
 use RuntimeException;
 
-class AiClientResolver
+class ClientResolver
 {
-    /** @param iterable<AiClientInterface> $clients */
+    /** @param iterable<ClientInterface> $clients */
     public function __construct(private iterable $clients) {}
 
-    public function getClient(AiClientEnum $clientEnum): AiClientInterface
+    public function getClient(ClientEnum $clientEnum): ClientInterface
     {
         foreach ($this->clients as $client) {
             if ($client->getClientEnum() === $clientEnum) return $client;

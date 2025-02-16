@@ -25,7 +25,7 @@ class Message
         return $this->role;
     }
 
-    public function setRole(MessageRoleEnum $role): self
+    public function setRole(MessageRoleEnum $role): static
     {
         $this->role = $role;
 
@@ -37,7 +37,7 @@ class Message
         return $this->content;
     }
 
-    public function setContent(?string $content): self
+    public function setContent(?string $content): static
     {
         $this->content = $content;
 
@@ -49,7 +49,7 @@ class Message
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
@@ -61,7 +61,7 @@ class Message
         return $this->toolCallId;
     }
 
-    public function setToolCallId(?string $toolCallId): self
+    public function setToolCallId(?string $toolCallId): static
     {
         $this->toolCallId = $toolCallId;
 
@@ -76,7 +76,7 @@ class Message
     /**
      * @param ?MessageToolCall[] $toolCalls
      */
-    public function setToolCalls(?array $toolCalls): self
+    public function setToolCalls(?array $toolCalls): static
     {
         $this->toolCalls = $toolCalls;
 

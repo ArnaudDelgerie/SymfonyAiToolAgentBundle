@@ -23,7 +23,7 @@ class ToolFunction
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -35,7 +35,7 @@ class ToolFunction
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(string $description): static
     {
         $this->description = $description;
 
@@ -43,7 +43,7 @@ class ToolFunction
     }
 
     /**
-     * @param ?ToolFunctionProperty[]
+     * @return ?ToolFunctionProperty[]
      */
     public function getProperties(): array
     {
@@ -51,20 +51,18 @@ class ToolFunction
     }
 
     #[Ignore]
-    public function getRequiredProperties(): array
+    public function getPropertiesName(): array
     {
         $requiredProperties = [];
         /** @var ToolFunctionProperty $property */
         foreach ($this->properties as $name => $property) {
-            if ($property->getRequired()) {
-                $requiredProperties[] = $name;
-            }
+            $requiredProperties[] = $name;
         }
 
         return $requiredProperties;
     }
 
-    public function addProperty(string $name, ToolFunctionProperty $property): self
+    public function addProperty(string $name, ToolFunctionProperty $property): static
     {
         $this->properties[$name] = $property;
 
@@ -74,7 +72,7 @@ class ToolFunction
     /**
      * @param ?ToolFunctionProperty[] $properties
      */
-    public function setProperties(array $properties): self
+    public function setProperties(array $properties): static
     {
         $this->properties = $properties;
 

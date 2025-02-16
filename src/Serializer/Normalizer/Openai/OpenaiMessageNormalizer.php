@@ -4,7 +4,7 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Openai;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class OpenaiMessageNormalizer implements NormalizerInterface
@@ -28,7 +28,7 @@ class OpenaiMessageNormalizer implements NormalizerInterface
 
     public function supportsNormalization($message, ?string $format = null, array $context = []): bool
     {
-        return $message instanceof Message && $context['clientEnum'] === AiClientEnum::Openai;
+        return $message instanceof Message && $context['clientEnum'] === ClientEnum::Openai;
     }
 
     public function getSupportedTypes(?string $format): array

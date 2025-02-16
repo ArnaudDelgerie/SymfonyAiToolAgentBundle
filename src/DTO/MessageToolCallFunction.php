@@ -13,7 +13,7 @@ class MessageToolCallFunction
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -25,7 +25,7 @@ class MessageToolCallFunction
         return $this->arguments;
     }
 
-    public function setArguments(?array $arguments): self
+    public function setArguments(?array $arguments): static
     {
         $this->arguments = $arguments;
 

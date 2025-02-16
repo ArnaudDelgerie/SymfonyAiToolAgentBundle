@@ -14,8 +14,6 @@ class ToolFunctionProperty
 
     private ?string $description = null;
 
-    private bool $required = true;
-
     private ?array $enum = null;
 
     #[SerializedName('items')]
@@ -37,7 +35,7 @@ class ToolFunctionProperty
         return $this->type;
     }
 
-    public function setType(ToolFunctionPropertyTypeEnum $type): self
+    public function setType(ToolFunctionPropertyTypeEnum $type): static
     {
         $this->type = $type;
 
@@ -49,22 +47,9 @@ class ToolFunctionProperty
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    #[Ignore]
-    public function getRequired(): bool
-    {
-        return $this->required;
-    }
-
-    public function setRequired(bool $required): self
-    {
-        $this->required = $required;
 
         return $this;
     }
@@ -74,7 +59,7 @@ class ToolFunctionProperty
         return $this->enum;
     }
 
-    public function setEnum(?array $enum): self
+    public function setEnum(?array $enum): static
     {
         $this->enum = $enum;
 
@@ -86,7 +71,7 @@ class ToolFunctionProperty
         return $this->arrayProperty;
     }
 
-    public function setArrayProperty(?ToolFunctionProperty $arrayProperty): self
+    public function setArrayProperty(?ToolFunctionProperty $arrayProperty): static
     {
         $this->arrayProperty = $arrayProperty;
 
@@ -94,7 +79,7 @@ class ToolFunctionProperty
     }
 
     /**
-     * @param ?ToolFunctionProperty[]
+     * @return ?ToolFunctionProperty[]
      */
     public function getObjectProperties(): array
     {
@@ -102,20 +87,18 @@ class ToolFunctionProperty
     }
 
     #[Ignore]
-    public function getObjectRequiredProperties(): array
+    public function getObjectPropertiesName(): array
     {
         $requiredProperties = [];
         /** @var ToolFunctionProperty $property */
         foreach ($this->objectProperties as $name => $property) {
-            if ($property->getRequired()) {
-                $requiredProperties[] = $name;
-            }
+            $requiredProperties[] = $name;
         }
 
         return $requiredProperties;
     }
 
-    public function addObjectProperty(string $name, ToolFunctionProperty $property): self
+    public function addObjectProperty(string $name, ToolFunctionProperty $property): static
     {
         $this->objectProperties[$name] = $property;
 
@@ -125,7 +108,7 @@ class ToolFunctionProperty
     /**
      * @param ?ToolFunctionProperty[] $objectProperties
      */
-    public function setObjectProperties(array $objectProperties): self
+    public function setObjectProperties(array $objectProperties): static
     {
         $this->objectProperties = $objectProperties;
 

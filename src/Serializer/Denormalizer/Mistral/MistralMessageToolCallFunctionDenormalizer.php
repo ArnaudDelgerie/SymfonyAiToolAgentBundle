@@ -3,7 +3,7 @@
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Denormalizer\Mistral;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCallFunction;
 
@@ -25,7 +25,7 @@ class MistralMessageToolCallFunctionDenormalizer implements DenormalizerInterfac
 
     public function supportsDenormalization(mixed $normalizedToolCallFunction, string $type, ?string $format = null, array $context = []): bool
     {
-        return $type === MessageToolCallFunction::class && $context['clientEnum'] === AiClientEnum::Mistral;
+        return $type === MessageToolCallFunction::class && $context['clientEnum'] === ClientEnum::Mistral;
     }
 
     public function getSupportedTypes(?string $format): array

@@ -3,12 +3,13 @@
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Interface;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolResponse;
 
 interface ToolFunctionManagerInterface
 {
     public static function getName(): string;
 
-    public function getToolFunction(): ToolFunction;
+    public function getToolFunction(array $context): ToolFunction;
 
-    public function execute(array $arguments, array $context, array &$taskReport): string;
+    public function execute(array $arguments, array &$context, array &$taskReport): ToolResponse;
 }

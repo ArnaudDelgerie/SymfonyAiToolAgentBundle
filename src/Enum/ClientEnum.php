@@ -2,7 +2,7 @@
 
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Enum;
 
-enum AiClientEnum: string
+enum ClientEnum: string
 {
     case Openai = 'openai';
 

@@ -4,7 +4,7 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Openai;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class OpenaiToolFunctionNormalizer implements NormalizerInterface
@@ -24,7 +24,7 @@ class OpenaiToolFunctionNormalizer implements NormalizerInterface
             'type' => 'object',
             'additionalProperties' => false,
             'properties' => $normalizedToolFunction['properties'],
-            'required' => $toolFunction->getRequiredProperties(),
+            'required' => $toolFunction->getPropertiesName(),
         ];
 
         unset($normalizedToolFunction['properties']);
@@ -34,7 +34,7 @@ class OpenaiToolFunctionNormalizer implements NormalizerInterface
 
     public function supportsNormalization($toolFunction, ?string $format = null, array $context = []): bool
     {
-        return $toolFunction instanceof ToolFunction && $context['clientEnum'] === AiClientEnum::Openai;
+        return $toolFunction instanceof ToolFunction && $context['clientEnum'] === ClientEnum::Openai;
     }
 
     public function getSupportedTypes(?string $format): array

@@ -8,10 +8,11 @@ services:
         resource: '../../'
         exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    ArnaudDelgerie\SymfonyAiToolAgent\Resolver\AiClientResolver:
+    ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ClientResolver:
         arguments:
             - !tagged_iterator 'symfony_ai_tool_agent.ai_client'
 
     ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ToolFunctionResolver:
         arguments:
             - !tagged_iterator 'symfony_ai_tool_agent.tool_function_manager'
+            - !tagged_iterator 'symfony_ai_tool_agent.console_tool_function_manager'

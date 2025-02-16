@@ -15,7 +15,7 @@ class MessageToolCall
         return $this->id;
     }
 
-    public function setId(string $id): self
+    public function setId(string $id): static
     {
         $this->id = $id;
 
@@ -27,7 +27,7 @@ class MessageToolCall
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(string $type): static
     {
         $this->type = $type;
 
@@ -39,7 +39,7 @@ class MessageToolCall
         return $this->function;
     }
 
-    public function setFunction(MessageToolCallFunction $function): self
+    public function setFunction(MessageToolCallFunction $function): static
     {
         $this->function = $function;
 

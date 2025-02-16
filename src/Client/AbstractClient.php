@@ -4,20 +4,20 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Client;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\AiClientInterface;
+use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
-readonly abstract class AbstractClient implements AiClientInterface
+readonly abstract class AbstractClient implements ClientInterface
 {
     public function __construct(
         private NormalizerInterface $normalizer,
         private DenormalizerInterface $denormalizer
     ) {}
 
-    protected function normalizeMessages(AiClientEnum $clientEnum, array $messages): array
+    protected function normalizeMessages(ClientEnum $clientEnum, array $messages): array
     {
         return $this->normalizer->normalize($messages, Message::class, [
             AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
@@ -26,7 +26,7 @@ readonly abstract class AbstractClient implements AiClientInterface
         ]);
     }
 
-    protected function normalizeTools(AiClientEnum $clientEnum, array $tools): array
+    protected function normalizeTools(ClientEnum $clientEnum, array $tools): array
     {
         return $this->normalizer->normalize($tools, ToolFunction::class, [
             AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
@@ -35,7 +35,7 @@ readonly abstract class AbstractClient implements AiClientInterface
         ]);
     }
 
-    protected function denormalizeMessage(AiClientEnum $clientEnum, array $message): Message
+    protected function denormalizeMessage(ClientEnum $clientEnum, array $message): Message
     {
         return $this->denormalizer->denormalize($message, Message::class, null, [
             'clientEnum' => $clientEnum,

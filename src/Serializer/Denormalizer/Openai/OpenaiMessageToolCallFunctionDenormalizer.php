@@ -3,7 +3,7 @@
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Denormalizer\Openai;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\AiClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCallFunction;
 
@@ -25,7 +25,7 @@ class OpenaiMessageToolCallFunctionDenormalizer implements DenormalizerInterface
 
     public function supportsDenormalization(mixed $normalizedToolCallFunction, string $type, ?string $format = null, array $context = []): bool
     {
-        return $type === MessageToolCallFunction::class && $context['clientEnum'] === AiClientEnum::Openai;
+        return $type === MessageToolCallFunction::class && $context['clientEnum'] === ClientEnum::Openai;
     }
 
     public function getSupportedTypes(?string $format): array
