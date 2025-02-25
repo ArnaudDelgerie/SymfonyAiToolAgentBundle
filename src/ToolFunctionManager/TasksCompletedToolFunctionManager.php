@@ -29,10 +29,10 @@ class TasksCompletedToolFunctionManager implements ToolFunctionManagerInterface
         );
     }
 
-    public function execute(array $args, array &$context, array &$taskReport): ToolResponse
+    public function execute(array $args, array $context): ToolResponse
     {
-        $this->updateTaskReport($taskReport, self::getName(), $args);
+        $context = $this->updateTaskReport($context, self::getName(), $args);
 
-        return new ToolResponse("OK", true);
+        return new ToolResponse($context, "OK", true);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopReasonEnum;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopStepEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopReasonEnum;
 
 class AgentStopReport
 {

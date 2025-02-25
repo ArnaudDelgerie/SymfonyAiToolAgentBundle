@@ -13,7 +13,7 @@ interface ConsoleToolFunctionManagerInterface
 
     public function getToolFunction(array $context): ToolFunction;
 
-    public function validate(array &$args, array &$context, array &$taskReport, AgentIO $agentIO): ToolValidation;
+    public function validate(array $args, array $context, AgentIO $agentIO): ToolValidation;
 
-    public function execute(array $args, array &$context, array &$taskReport, AgentIO $agentIO): ToolResponse;
+    public function execute(array $args, array $context, AgentIO $agentIO): ToolResponse;
 }

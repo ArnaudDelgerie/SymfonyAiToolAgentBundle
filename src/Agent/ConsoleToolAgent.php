@@ -5,57 +5,54 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Agent;
 use RuntimeException;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentIO;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopStepEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientConfig;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentResponse;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCall;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopReasonEnum;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\MessageRoleEnum;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentStopReport;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolAgentHelper;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentStopCommand;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopStepEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ClientResolver;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ToolFunctionResolver;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentUsageReport;
+use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
 
-class ConsoleToolAgent extends AbstractToolAgent
+class ConsoleToolAgent
 {
-    private bool $toolOnly = true;
-
     private bool $usageLog = true;
 
     private array $stopCommands = [];
 
+    private ClientInterface $client;
+
+    private array $toolFunctions = [];
+
+    private array $messages;
+
+    private bool $initialized = false;
+
+    private int $nbRequest = 0;
+
+    private bool $userPromptRequired = true;
+
     public function __construct(
-        ClientResolver       $clientResolver,
-        ValidatorInterface   $validator,
-        ToolFunctionResolver $toolFunctionResolver,
-        NormalizerInterface  $normalizer,
+        private ToolAgentHelper  $toolAgentHelper,
+        private ClientConfig     $clientConfig,
+        private array            $context,
+        private AgentUsageReport $usageReport,
     ) {
-        parent::__construct($clientResolver, $validator, $toolFunctionResolver, $normalizer);
+        $this->client = $this->toolAgentHelper->getClient($this->clientConfig);
     }
 
-    public function init(
-        ClientEnum  $clientEnum,
-        string      $apiKey,
-        string      $model,
-        array       $functions,
-        string      $sysPrompt,
-        ?string     $userPrompt = null
-    ): static {
-        $this->sysPrompt = $sysPrompt;
-        $this->initClient($clientEnum);
-        $this->initToolFunctions('console', $functions);
-        $this->initMessages($sysPrompt, $userPrompt);
-        $this->initClientParameters($apiKey, $model);
-        $this->initialized = true;
-
-        return $this;
-    }
-
-    public function setToolOnly(bool $toolOnly): static
+    public function init(array $functionNames, string $sysPrompt, ?string $userPrompt = null): static 
     {
-        $this->toolOnly = $toolOnly;
+        $this->toolFunctions = $this->toolAgentHelper->getConsoleToolFunctions($functionNames, $this->context);
+        $this->messages = [$this->toolAgentHelper->getMessage(MessageRoleEnum::System, $sysPrompt)];
+        if ($userPrompt) {
+            $this->userPromptRequired = false;
+            $this->messages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt);
+        }
+        $this->initialized = true;
 
         return $this;
     }
@@ -78,63 +75,69 @@ class ConsoleToolAgent extends AbstractToolAgent
             }
             if (null === $userPrompt || $this->isStopCommand($userPrompt)) {
                 $stopReport = new AgentStopReport(StopReasonEnum::Command, $userPrompt ?? '');
-                return new AgentResponse($stopReport, $this->usageReport, $this->taskReport);
+                return new AgentResponse($stopReport, $this->usageReport, $this->context);
             }
-            $this->messages[] = $this->getMessage(MessageRoleEnum::User, $userPrompt);
+            $this->messages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt);
             $this->userPromptRequired = false;
         }
 
-        $clientResponse = $this->client->chat($this->model, $this->apiKey, $this->messages, $this->toolFunctions, $this->temperature, $this->toolOnly);
+        $clientResponse = $this->client->chat($this->messages, $this->toolFunctions);
         $this->usageReport->merge($clientResponse->usageReport);
-        $message = $clientResponse->message;
+        $assistantMessage = $clientResponse->message;
 
         if ($this->usageLog) {
             $agentIO->logUsage($this->usageReport);
         }
 
-        if (null === $message->getToolCalls() || count($message->getToolCalls()) === 0) {
-            $this->messages[] = $message;
+        if (null === $assistantMessage->getToolCalls() || count($assistantMessage->getToolCalls()) === 0) {
+            $this->messages[] = $assistantMessage;
             $this->userPromptRequired = true;
-            $agentIO->text($message->getContent());
+            $agentIO->text($assistantMessage->getContent());
             return $this->run($agentIO, $question);
         }
 
         $completedToolCalls = $toolMessages = [];
         /** @var MessageToolCall $toolCall */
-        foreach ($message->getToolCalls() as $toolCall) {
+        foreach ($assistantMessage->getToolCalls() as $toolCall) {
             $completedToolCalls[] = $toolCall;
             $functionName = $toolCall->getFunction()->getName();
-            $arguments = $toolCall->getFunction()->getArguments();
-            $toolFunctionManager = $this->toolFunctionResolver->getInteractiveCommandToolFunctionManager($functionName);
-            $validation = $toolFunctionManager->validate($arguments, $this->context, $this->taskReport, $agentIO);
+            $args = $toolCall->getFunction()->getArguments();
+
+            $toolFunctionManager = $this->toolAgentHelper->getConsoleToolFunctionManager($functionName);
+            $validation = $toolFunctionManager->validate($args, $this->context, $agentIO);
+
+            $args = $validation->args;
+            $this->context = $validation->context;
+
             if (!$validation->isExecutable) {
-                $toolMessages[] = $this->getMessage(MessageRoleEnum::Tool, $validation->message, $functionName, $toolCall->getId());
-                if (!$validation->continueSequence) {
-                    $message->setToolCalls($completedToolCalls);
-                    if ($validation->stop) {
-                        return $this->toolStop($toolMessages, $message, StopReasonEnum::Function, $functionName, StopStepEnum::Call);
+                $toolMessages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::Tool, $validation->message, $functionName, $toolCall->getId());
+                if ($validation->stopSequence) {
+                    $assistantMessage->setToolCalls($completedToolCalls);
+                    if ($validation->stopRun) {
+                        return $this->toolStop($toolMessages, $assistantMessage, StopReasonEnum::Function, $functionName, StopStepEnum::Call);
                     }
                     break;
                 }
             } else {
-                $response = $toolFunctionManager->execute($arguments, $this->context, $this->taskReport, $agentIO);
-                $toolMessages[] = $this->getMessage(MessageRoleEnum::Tool, $response->message, $functionName, $toolCall->getId());
-                if ($response->stop) {
-                    $message->setToolCalls($completedToolCalls);
-                    return $this->toolStop($toolMessages, $message, StopReasonEnum::Function, $functionName, StopStepEnum::Execute);
+                $response = $toolFunctionManager->execute($args, $this->context, $agentIO);
+                $this->context = $response->context;
+                $toolMessages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::Tool, $response->message, $functionName, $toolCall->getId());
+                if ($response->stopRun) {
+                    $assistantMessage->setToolCalls($completedToolCalls);
+                    return $this->toolStop($toolMessages, $assistantMessage, StopReasonEnum::Function, $functionName, StopStepEnum::Execute);
                 }
             }
         }
 
         $this->nbRequest = $this->nbRequest + 1;
-        if ($this->nbRequest < $this->requestLimit) {
-            $this->messages = array_merge($this->messages, [$message], $toolMessages);
+        if ($this->nbRequest < $this->clientConfig->requestLimit) {
+            $this->messages = array_merge($this->messages, [$assistantMessage], $toolMessages);
             return $this->run($agentIO, $question);
         }
 
         $agentIO->alert('Request limit reached');
-        $message->setToolCalls($completedToolCalls);
-        return $this->toolStop($toolMessages, $message, StopReasonEnum::RequestLimit, (string) $this->nbRequest);
+        $assistantMessage->setToolCalls($completedToolCalls);
+        return $this->toolStop($toolMessages, $assistantMessage, StopReasonEnum::RequestLimit, (string) $this->nbRequest);
     }
 
     public function setUsageLog(bool $usageLog): static
@@ -160,20 +163,13 @@ class ConsoleToolAgent extends AbstractToolAgent
         return $this;
     }
 
-    public function clearMessages(): static
-    {
-        $this->messages = [$this->getMessage(MessageRoleEnum::System, $this->sysPrompt)];
-
-        return $this;
-    }
-
-    private function toolStop(array $toolMessages, Message $message, StopReasonEnum $stopReason, string $stopValue, ?StopStepEnum $stopReasonStep = null): AgentResponse
+    private function toolStop(array $toolMessages, Message $assistantMessage, StopReasonEnum $stopReason, string $stopValue, ?StopStepEnum $stopReasonStep = null): AgentResponse
     {
         $this->userPromptRequired = true;
-        $toolMessages[] = $this->getMessage(MessageRoleEnum::Assistant, 'All tasks are completed, what would you like to do?');
-        $this->messages = array_merge($this->messages, [$message], $toolMessages);
+        $toolMessages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::Assistant, 'All tasks are completed, what would you like to do?');
+        $this->messages = array_merge($this->messages, [$assistantMessage], $toolMessages);
         $stopReport = new AgentStopReport($stopReason, $stopValue, $stopReasonStep);
-        return new AgentResponse($stopReport, $this->usageReport, $this->taskReport);
+        return new AgentResponse($stopReport, $this->usageReport, $this->context);
     }
 
     private function isStopCommand(string $command): bool

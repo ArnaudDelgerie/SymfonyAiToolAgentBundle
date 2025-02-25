@@ -31,16 +31,16 @@ class ConsoleTasksCompletedToolFunctionManager implements ConsoleToolFunctionMan
         );
     }
 
-    public function validate(array &$args, array &$context, array &$taskReport, AgentIO $agentIO): ToolValidation
+    public function validate(array $args, array $context, AgentIO $agentIO): ToolValidation
     {
-        return new ToolValidation();
+        return new ToolValidation($args, $context);
     }
 
-    public function execute(array $args, array &$context, array &$taskReport, AgentIO $agentIO): ToolResponse
+    public function execute(array $args, array $context, AgentIO $agentIO): ToolResponse
     {
-        $this->updateTaskReport($taskReport, self::getName(), $args);
+        $context = $this->updateTaskReport($context, self::getName(), $args);
         $agentIO->text($args['TasksSummary']);
 
-        return new ToolResponse("OK", true);
+        return new ToolResponse($context, "OK", true);
     }
 }

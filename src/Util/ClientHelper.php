@@ -1,23 +1,22 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Client;
+namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
-readonly abstract class AbstractClient implements ClientInterface
+class ClientHelper
 {
     public function __construct(
-        private NormalizerInterface $normalizer,
+        private NormalizerInterface   $normalizer,
         private DenormalizerInterface $denormalizer
     ) {}
 
-    protected function normalizeMessages(ClientEnum $clientEnum, array $messages): array
+    public function normalizeMessages(ClientEnum $clientEnum, array $messages): array
     {
         return $this->normalizer->normalize($messages, Message::class, [
             AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
@@ -26,7 +25,7 @@ readonly abstract class AbstractClient implements ClientInterface
         ]);
     }
 
-    protected function normalizeTools(ClientEnum $clientEnum, array $tools): array
+    public function normalizeTools(ClientEnum $clientEnum, array $tools): array
     {
         return $this->normalizer->normalize($tools, ToolFunction::class, [
             AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
@@ -35,7 +34,7 @@ readonly abstract class AbstractClient implements ClientInterface
         ]);
     }
 
-    protected function denormalizeMessage(ClientEnum $clientEnum, array $message): Message
+    public function denormalizeMessage(ClientEnum $clientEnum, array $message): Message
     {
         return $this->denormalizer->denormalize($message, Message::class, null, [
             'clientEnum' => $clientEnum,

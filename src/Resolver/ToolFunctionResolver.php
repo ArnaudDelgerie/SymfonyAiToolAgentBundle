@@ -4,14 +4,14 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Resolver;
 
 use RuntimeException;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
 use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ToolFunctionManagerInterface;
+use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
 
 class ToolFunctionResolver
 {
     public function __construct(
         private iterable $toolFunctionManagers,
-        private iterable $interactiveCommandToolFunctionManagers
+        private iterable $consoleToolFunctionManagers
     ) {}
 
     public function getToolFunctionManager(string $name): ToolFunctionManagerInterface
@@ -24,10 +24,10 @@ class ToolFunctionResolver
         throw new RuntimeException($name . ' toolFunctionManager not found');
     }
 
-    public function getInteractiveCommandToolFunctionManager(string $name): ConsoleToolFunctionManagerInterface
+    public function getConsoleToolFunctionManager(string $name): ConsoleToolFunctionManagerInterface
     {
         /** @var ConsoleToolFunctionManagerInterface $toolFunctionManager */
-        foreach ($this->interactiveCommandToolFunctionManagers as $toolFunctionManager) {
+        foreach ($this->consoleToolFunctionManagers as $toolFunctionManager) {
             if ($toolFunctionManager::getName() === $name) return $toolFunctionManager;
         }
 
@@ -35,15 +35,15 @@ class ToolFunctionResolver
     }
 
     /**
-     * @return ToolFunction[] $toolFunctions
+     * @return ToolFunction[]
      */
-    public function getToolFunctions(array $names, array $context): array
+    public function getToolFunctions(array $names, array $contextData): array
     {
         $toolFunctions = [];
         /** @var ToolFunctionManagerInterface $toolFunctionManager */
         foreach ($this->toolFunctionManagers as $toolFunctionManager) {
             if (in_array($toolFunctionManager::getName(), $names, true)) {
-                $toolFunctions[] = $toolFunctionManager->getToolFunction($context);
+                $toolFunctions[] = $toolFunctionManager->getToolFunction($contextData);
             }
         }
 
@@ -55,15 +55,15 @@ class ToolFunctionResolver
     }
 
     /**
-     * @return ToolFunction[] $toolFunctions
+     * @return ToolFunction[]
      */
-    public function getInteractiveCommandToolFunctions(array $names, array $context): array
+    public function getConsoleToolFunctions(array $names, array $contextData): array
     {
         $toolFunctions = [];
         /** @var ConsoleToolFunctionManagerInterface $toolFunctionManager */
-        foreach ($this->interactiveCommandToolFunctionManagers as $toolFunctionManager) {
+        foreach ($this->consoleToolFunctionManagers as $toolFunctionManager) {
             if (in_array($toolFunctionManager::getName(), $names, true)) {
-                $toolFunctions[] = $toolFunctionManager->getToolFunction($context);
+                $toolFunctions[] = $toolFunctionManager->getToolFunction($contextData);
             }
         }
 

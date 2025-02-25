@@ -4,27 +4,18 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\Agent\ToolAgent;
 use ArnaudDelgerie\SymfonyAiToolAgent\Agent\ConsoleToolAgent;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ClientResolver;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ToolFunctionResolver;
 
 class ToolAgentProvider
 {
-    public function __construct(
-        private ClientResolver       $clientResolver,
-        private ValidatorInterface   $validator,
-        private ToolFunctionResolver $toolFunctionResolver,
-        private NormalizerInterface  $normalizer,
-    ) {}
+    public function __construct(private ToolAgentHelper $toolAgentHelper) {}
 
-    public function createToolAgent(): ToolAgent
+    public function createToolAgent(ClientConfig $clientConfig, array $context = [], AgentUsageReport $usageReport = new AgentUsageReport()): ToolAgent
     {
-        return new ToolAgent($this->clientResolver, $this->validator, $this->toolFunctionResolver, $this->normalizer);
+        return new ToolAgent($this->toolAgentHelper, $clientConfig, $context, $usageReport);
     }
 
-    public function createConsoleToolAgent(): ConsoleToolAgent
+    public function createConsoleToolAgent(ClientConfig $clientConfig, array $context = [], AgentUsageReport $usageReport = new AgentUsageReport()): ConsoleToolAgent
     {
-        return new ConsoleToolAgent($this->clientResolver, $this->validator, $this->toolFunctionResolver, $this->normalizer);
+        return new ConsoleToolAgent($this->toolAgentHelper, $clientConfig, $context, $usageReport);
     }
 }

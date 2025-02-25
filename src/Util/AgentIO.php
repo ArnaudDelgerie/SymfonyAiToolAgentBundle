@@ -8,9 +8,9 @@ class AgentIO
 {
     public function __construct(
         public SymfonyStyle $io,
-        public string $agentLabel = 'ToolAgent',
-        public string $userLabel = 'You',
-        public string $agentColor = 'blue'
+        public string       $agentLabel = 'ToolAgent',
+        public string       $userLabel = 'You',
+        public string       $agentColor = 'blue'
     ) {}
 
     public function ask(string $question, string $default = null, ?callable $validator = null): ?string

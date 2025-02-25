@@ -4,12 +4,18 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Trait;
 
 trait TaskReportTrait
 {
-    public function updateTaskReport(array &$taskReport, string $functionName, array $args): void
+    public function updateTaskReport(array $context, string $functionName, array $args): array
     {
-        if (!isset($taskReport[$functionName])) {
-            $taskReport[$functionName] = [];
+        if (!isset($context['taskReport'])) {
+            $context['taskReport'] = [];
         }
 
-        $taskReport[$functionName][] = $args;
+        if (!isset($context['taskReport'][$functionName])) {
+            $context['taskReport'][$functionName] = [];
+        }
+
+        $context['taskReport'][$functionName][] = $args;
+
+        return $context;
     }
 }

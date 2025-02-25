@@ -2,9 +2,9 @@
 
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Openai;
 
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class OpenaiToolFunctionNormalizer implements NormalizerInterface

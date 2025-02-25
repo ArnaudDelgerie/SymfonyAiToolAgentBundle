@@ -4,41 +4,45 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Agent;
 
 use RuntimeException;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopStepEnum;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientConfig;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentResponse;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCall;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopReasonEnum;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\MessageRoleEnum;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentStopReport;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopStepEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ClientResolver;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ToolFunctionResolver;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolAgentHelper;
+use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentUsageReport;
+use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
 
-class ToolAgent extends AbstractToolAgent
+class ToolAgent
 {
+    private ClientInterface $client;
+
+    private array $toolFunctions = [];
+
+    private array $messages = [];
+
+    private bool $initialized = false;
+
+    private int $nbRequest = 0;
+
     public function __construct(
-        ClientResolver     $clientResolver,
-        ValidatorInterface   $validator,
-        ToolFunctionResolver $toolFunctionResolver,
-        NormalizerInterface  $normalizer,
+        private ToolAgentHelper  $toolAgentHelper,
+        private ClientConfig     $clientConfig,
+        private array            $context,
+        private AgentUsageReport $usageReport,
     ) {
-        parent::__construct($clientResolver, $validator, $toolFunctionResolver, $normalizer);
+        $this->client = $this->toolAgentHelper->getClient($this->clientConfig);
     }
 
-    public function init(
-        ClientEnum $clientEnum,
-        string       $apiKey,
-        string       $model,
-        array        $functions,
-        string       $sysPrompt,
-        string       $userPrompt
-    ): static {
-        $this->initClient($clientEnum);
-        $this->initToolFunctions('std', $functions);
-        $this->initMessages($sysPrompt, $userPrompt);
-        $this->initClientParameters($apiKey, $model);
+    public function init(array $functionNames, string $sysPrompt, string $userPrompt): static 
+    {
+        $this->toolFunctions = $this->toolAgentHelper->getToolFunctions($functionNames, $this->context);
+        $this->messages = [ 
+            $this->toolAgentHelper->getMessage(MessageRoleEnum::System, $sysPrompt),
+            $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt),
+        ];
         $this->initialized = true;
 
         return $this;
@@ -50,7 +54,7 @@ class ToolAgent extends AbstractToolAgent
             throw new RuntimeException('"run" method cannot be called before "init" method');
         }
 
-        $clientResponse = $this->client->chat($this->model, $this->apiKey, $this->messages, $this->toolFunctions, $this->temperature, true);
+        $clientResponse = $this->client->chat($this->messages, $this->toolFunctions);
         $this->usageReport->merge($clientResponse->usageReport);
         $message = $clientResponse->message;
         $this->messages[] = $message;
@@ -59,27 +63,30 @@ class ToolAgent extends AbstractToolAgent
         foreach ($message->getToolCalls() as $toolCall) {
             $functionName = $toolCall->getFunction()->getName();
             $arguments = $toolCall->getFunction()->getArguments();
-            $toolFunctionManager = $this->toolFunctionResolver->getToolFunctionManager($functionName);
-            $response = $toolFunctionManager->execute($arguments, $this->context, $this->taskReport);
+
+            $toolFunctionManager = $this->toolAgentHelper->getToolFunctionManager($functionName);
+            $response = $toolFunctionManager->execute($arguments, $this->context);
+
+            $this->context = $response->context;
             $this->messages[] = (new Message())
                 ->setRole(MessageRoleEnum::Tool)
                 ->setContent($response->message)
                 ->setName($functionName)
                 ->setToolCallId($toolCall->getId());
 
-            if ($response->stop) {
+            if ($response->stopRun) {
                 $this->initialized = false;
                 $stopReport = new AgentStopReport(StopReasonEnum::Function, $functionName, StopStepEnum::Execute);
-                return new AgentResponse($stopReport, $this->usageReport, $this->taskReport);
+                return new AgentResponse($stopReport, $this->usageReport, $this->context);
             }
         }
 
         $this->nbRequest = $this->nbRequest + 1;
-        if ($this->nbRequest < $this->requestLimit) {
+        if ($this->nbRequest < $this->clientConfig->requestLimit) {
             return $this->run();
         }
 
         $stopReport = new AgentStopReport(StopReasonEnum::RequestLimit, (string) $this->nbRequest);
-        return new AgentResponse($stopReport, $this->usageReport, $this->taskReport);
+        return new AgentResponse($stopReport, $this->usageReport, $this->context);
     }
 }

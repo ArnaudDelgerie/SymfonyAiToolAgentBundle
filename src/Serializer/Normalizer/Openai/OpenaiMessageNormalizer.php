@@ -3,8 +3,8 @@
 namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Openai;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class OpenaiMessageNormalizer implements NormalizerInterface
