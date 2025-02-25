@@ -46,7 +46,7 @@ class ToolAgent
         $this->toolFunctions = $this->toolAgentHelper->getToolFunctions($functionNames, $this->context);
         $this->messages = [
             $this->toolAgentHelper->getMessage(MessageRoleEnum::System, $sysPrompt),
-            $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt, null, null, $images)
+            $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt ?? "", null, null, $images)
         ];
         $this->initialized = true;
 

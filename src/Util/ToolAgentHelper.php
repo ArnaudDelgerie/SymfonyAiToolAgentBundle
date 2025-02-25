@@ -58,7 +58,7 @@ class ToolAgentHelper
         return $this->toolFunctionResolver->getConsoleToolFunctionManager($functionName);
     }
 
-    public function getMessage(MessageRoleEnum $role, ?string $content = null, ?string $functionName = null, ?string $toolCallId = null, array $images = []): Message
+    public function getMessage(MessageRoleEnum $role, string $content, ?string $functionName = null, ?string $toolCallId = null, array $images = []): Message
     {
         return (new Message())
             ->setRole($role)

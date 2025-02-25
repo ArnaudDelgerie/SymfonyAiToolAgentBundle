@@ -27,7 +27,7 @@ class OpenaiMessageNormalizer implements NormalizerInterface
         $images = $message->getImages();
         if (count($images) > 0) {
             $messageContents = [];
-            if ($normalizedMessage['content'] !== null) {
+            if ($normalizedMessage['content'] !== "") {
                 $messageContents[] = ['type' => 'text', 'text' => $normalizedMessage['content']];
             }
 

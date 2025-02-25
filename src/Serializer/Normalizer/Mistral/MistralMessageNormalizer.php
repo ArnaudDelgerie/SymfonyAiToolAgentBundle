@@ -22,7 +22,7 @@ class MistralMessageNormalizer implements NormalizerInterface
 
         if (count($message->getImages()) > 0) {
             $messageContents = [];
-            if ($normalizedMessage['content'] !== null) {
+            if ($normalizedMessage['content'] !== "") {
                 $messageContents[] = ['type' => 'text', 'text' => $normalizedMessage['content']];
             }
 
