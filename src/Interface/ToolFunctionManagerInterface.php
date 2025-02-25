@@ -11,5 +11,5 @@ interface ToolFunctionManagerInterface
 
     public function getToolFunction(array $context): ToolFunction;
 
-    public function execute(array $arguments, array $context): ToolResponse;
+    public function execute(array $ars, array $context): ToolResponse;
 }

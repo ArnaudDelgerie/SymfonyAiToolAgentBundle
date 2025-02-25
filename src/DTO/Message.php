@@ -2,8 +2,10 @@
 
 namespace ArnaudDelgerie\SymfonyAiToolAgent\DTO;
 
-use Symfony\Component\Serializer\Attribute\SerializedName;
+use RuntimeException;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCall;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\MessageRoleEnum;
 
 class Message
@@ -19,6 +21,8 @@ class Message
 
     #[SerializedName('tool_calls')]
     private ?array $toolCalls = null;
+
+    private array $images = [];
 
     public function getRole(): ?MessageRoleEnum
     {
@@ -79,6 +83,31 @@ class Message
     public function setToolCalls(?array $toolCalls): static
     {
         $this->toolCalls = $toolCalls;
+
+        return $this;
+    }
+
+    #[Ignore]
+    /**
+     * @return ?MessageImage[]
+     */
+    public function getImages(): ?array
+    {
+        return $this->images;
+    }
+
+    /**
+     * @param ?MessageImage[] $images
+     */
+    public function setImages(?array $images): static
+    {
+        foreach ($images as $image) {
+            if (!$image instanceof MessageImage) {
+                throw new RuntimeException('$images must be an array of ' . MessageImage::class);
+            }
+        }
+
+        $this->images = $images;
 
         return $this;
     }

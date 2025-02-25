@@ -1,6 +1,6 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Openai;
+namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Mistral;
 
 use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
@@ -8,7 +8,7 @@ use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageImage;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class OpenaiMessageNormalizer implements NormalizerInterface
+class MistralMessageNormalizer implements NormalizerInterface
 {
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')]
@@ -20,22 +20,17 @@ class OpenaiMessageNormalizer implements NormalizerInterface
         /** @var Message $message */
         $normalizedMessage = $this->normalizer->normalize($message, $format, $context);
 
-        if ($normalizedMessage['role'] === 'system') {
-            $normalizedMessage['role'] = 'developer';
-        }
-
-        $images = $message->getImages();
-        if (count($images) > 0) {
+        if (count($message->getImages()) > 0) {
             $messageContents = [];
             if ($normalizedMessage['content'] !== null) {
                 $messageContents[] = ['type' => 'text', 'text' => $normalizedMessage['content']];
             }
 
             /** @var MessageImage $image */
-            foreach ($images as $image) {
+            foreach ($message->getImages() as $image) {
                 $messageContents[] = [
                     'type' => 'image_url',
-                    'image_url' => ['url' => \sprintf("data:%s;base64,%s", $image->type->value, $image->base64)],
+                    'image_url' => \sprintf("data:%s;base64,%s", $image->type->value, $image->base64),
                 ];
             }
 
@@ -47,7 +42,7 @@ class OpenaiMessageNormalizer implements NormalizerInterface
 
     public function supportsNormalization($message, ?string $format = null, array $context = []): bool
     {
-        return $message instanceof Message && $context['clientEnum'] === ClientEnum::Openai;
+        return $message instanceof Message && $context['clientEnum'] === ClientEnum::Mistral;
     }
 
     public function getSupportedTypes(?string $format): array

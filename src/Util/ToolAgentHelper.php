@@ -58,13 +58,14 @@ class ToolAgentHelper
         return $this->toolFunctionResolver->getConsoleToolFunctionManager($functionName);
     }
 
-    public function getMessage(MessageRoleEnum $role, string $content, ?string $functionName = null, ?string $toolCallId = null): Message
+    public function getMessage(MessageRoleEnum $role, ?string $content = null, ?string $functionName = null, ?string $toolCallId = null, array $images = []): Message
     {
         return (new Message())
             ->setRole($role)
             ->setContent($content)
             ->setName($functionName)
-            ->setToolCallId($toolCallId);
+            ->setToolCallId($toolCallId)
+            ->setImages($images);
     }
 
     private function validateToolFunctions(array $toolFunctions): void

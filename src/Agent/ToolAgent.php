@@ -33,15 +33,20 @@ class ToolAgent
         private array            $context,
         private AgentUsageReport $usageReport,
     ) {
+        $this->clientConfig->toolOnly = true;
         $this->client = $this->toolAgentHelper->getClient($this->clientConfig);
     }
 
-    public function init(array $functionNames, string $sysPrompt, string $userPrompt): static 
+    public function init(array $functionNames, string $sysPrompt, ?string $userPrompt = null, array $images = []): static 
     {
+        if (null === $userPrompt && 0 === count($images)) {
+            throw new RuntimeException('ToolAgent: "init" method must be called with $userPrompt !== null or count($images) > 0');
+        }
+
         $this->toolFunctions = $this->toolAgentHelper->getToolFunctions($functionNames, $this->context);
-        $this->messages = [ 
+        $this->messages = [
             $this->toolAgentHelper->getMessage(MessageRoleEnum::System, $sysPrompt),
-            $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt),
+            $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt, null, null, $images)
         ];
         $this->initialized = true;
 
@@ -51,7 +56,7 @@ class ToolAgent
     public function run(): AgentResponse
     {
         if (false === $this->initialized) {
-            throw new RuntimeException('"run" method cannot be called before "init" method');
+            throw new RuntimeException('ToolAgent: "run" method cannot be called before "init" method');
         }
 
         $clientResponse = $this->client->chat($this->messages, $this->toolFunctions);
