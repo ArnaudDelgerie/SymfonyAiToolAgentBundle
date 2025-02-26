@@ -4,25 +4,24 @@ namespace ArnaudDelgerie\SymfonyAiToolAgent\Client;
 
 use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
+use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
 use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientConfig;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientHelper;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientResponse;
 use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentUsageReport;
 use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
-class MistralClient implements ClientInterface
+class AnthropicClient implements ClientInterface
 {
-    private int $retry = 0;
-
     private ?ClientConfig $config = null;
 
     public function __construct(private ClientHelper $clientHelper) {}
 
     public function getClientEnum(): ClientEnum
     {
-        return ClientEnum::Mistral;
+        return ClientEnum::Anthropic;
     }
 
     public function setConfig(ClientConfig $config): void
@@ -30,37 +29,32 @@ class MistralClient implements ClientInterface
         $this->config = $config;
     }
 
-    public function chat(array $messages, array $tools = []): ClientResponse
-    {    
+    public function chat(array  $messages, array  $tools = []): ClientResponse
+    {
         if (!$this->config instanceof ClientConfig) {
-            throw new RuntimeException('MistralClient::config must be an instance of ClientCongig');
+            throw new RuntimeException('AnthropicClient::config must be an instance of ClientCongig');
         }
 
+        /** @var Message $sysMessage */
+        $sysMessage = array_shift($messages);
 
         $client = HttpClient::create(['timeout' => $this->config->timeout]);
-        $response = $client->request('POST', 'https://api.mistral.ai/v1/chat/completions', [
+        $response = $client->request('POST', 'https://api.anthropic.com/v1/messages', [
             'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $this->config->apiKey,
+                'content-type' => 'application/json',
+                'anthropic-version' => '2023-06-01',
+                'x-api-key' => $this->config->apiKey,
             ],
             'json' => [
                 'model' => $this->config->model,
                 'temperature' => $this->config->temperature,
+                'max_tokens' => 8192,
+                'system' => $sysMessage->getContent(),
                 'messages' => $this->clientHelper->normalizeMessages($this->getClientEnum(), $messages),
                 'tools' => $this->clientHelper->normalizeTools($this->getClientEnum(), $tools),
-                'tool_choice' => $this->config->toolOnly ? 'any' : 'auto'
+                'tool_choice' => ['type' => $this->config->toolOnly ? 'any' : 'auto', 'disable_parallel_tool_use' => false]
             ],
         ]);
-
-        // Use to get around the rate limitations of the free plan
-        if (429 === $response->getStatusCode() && $this->retry < 3) {
-            sleep(2);
-            $this->retry = $this->retry + 1;
-            return $this->chat($messages, $tools);
-        }
-
-        $this->retry = 0;
 
         try {
             $response = $response->toArray();
@@ -68,8 +62,8 @@ class MistralClient implements ClientInterface
             throw $e;
         }
 
-        $message = $this->clientHelper->denormalizeMessage($this->getClientEnum(), $response['choices'][0]['message']);
-        $usageReport = new AgentUsageReport(1, $response['usage']['prompt_tokens'], $response['usage']['completion_tokens']);
+        $message = $this->clientHelper->denormalizeMessage($this->getClientEnum(), ['role' => $response['role'], 'content' => $response['content']]);
+        $usageReport = new AgentUsageReport(1, $response['usage']['input_tokens'], $response['usage']['output_tokens']);
 
         return new ClientResponse($message, $usageReport);
     }
