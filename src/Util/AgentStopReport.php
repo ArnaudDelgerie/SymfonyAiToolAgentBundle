@@ -1,15 +1,15 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopStepEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopReasonEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\StopStepEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\StopReasonEnum;
 
 class AgentStopReport
 {
     public function __construct(
         public StopReasonEnum $stopReason,
-        public string         $value,
+        public mixed         $value,
         public ?StopStepEnum  $step = null,
     ) {}
 }

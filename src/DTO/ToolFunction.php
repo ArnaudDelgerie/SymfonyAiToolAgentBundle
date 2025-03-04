@@ -1,10 +1,10 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\DTO;
+namespace ArnaudDelgerie\AiToolAgent\DTO;
 
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunctionProperty;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunctionProperty;
 
 class ToolFunction
 {

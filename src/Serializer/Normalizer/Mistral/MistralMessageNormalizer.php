@@ -1,10 +1,10 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Mistral;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Normalizer\Mistral;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageImage;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\MessageImage;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
 class AgentResponse
 {
     public function __construct(
         public AgentStopReport  $stopReport,
         public AgentUsageReport $usageReport,
-        public array            $context,
+        public array            $content,
     ) {}
 }

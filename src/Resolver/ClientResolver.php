@@ -1,10 +1,10 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Resolver;
+namespace ArnaudDelgerie\AiToolAgent\Resolver;
 
 use RuntimeException;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientConfig;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
+use ArnaudDelgerie\AiToolAgent\Util\ClientConfig;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
 
 class ClientResolver
 {

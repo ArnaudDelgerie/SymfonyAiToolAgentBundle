@@ -1,8 +1,8 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\DTO;
+namespace ArnaudDelgerie\AiToolAgent\DTO;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ImageTypeEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ImageTypeEnum;
 
 class MessageImage
 {

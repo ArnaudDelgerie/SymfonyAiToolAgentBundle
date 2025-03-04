@@ -1,6 +1,6 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\DTO;
+namespace ArnaudDelgerie\AiToolAgent\DTO;
 
 class MessageToolCall
 {    

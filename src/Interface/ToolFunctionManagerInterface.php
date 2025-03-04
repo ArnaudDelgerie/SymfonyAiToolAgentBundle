@@ -1,9 +1,9 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Interface;
+namespace ArnaudDelgerie\AiToolAgent\Interface;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolResponse;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\Util\ToolResponse;
 
 interface ToolFunctionManagerInterface
 {
@@ -11,5 +11,5 @@ interface ToolFunctionManagerInterface
 
     public function getToolFunction(array $context): ToolFunction;
 
-    public function execute(array $ars, array $context): ToolResponse;
+    public function execute(array $ars, array $context, array $responseContent): ToolResponse;
 }

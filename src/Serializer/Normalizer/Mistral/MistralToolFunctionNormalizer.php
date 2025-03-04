@@ -1,9 +1,9 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Mistral;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Normalizer\Mistral;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

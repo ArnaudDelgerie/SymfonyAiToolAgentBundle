@@ -1,10 +1,10 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Interface;
+namespace ArnaudDelgerie\AiToolAgent\Interface;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientConfig;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientResponse;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\Util\ClientConfig;
+use ArnaudDelgerie\AiToolAgent\Util\ClientResponse;
 
 interface ClientInterface
 {

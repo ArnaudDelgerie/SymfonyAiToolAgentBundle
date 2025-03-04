@@ -1,11 +1,11 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Resolver;
+namespace ArnaudDelgerie\AiToolAgent\Resolver;
 
 use RuntimeException;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ToolFunctionManagerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\Interface\ToolFunctionManagerInterface;
+use ArnaudDelgerie\AiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
 
 class ToolFunctionResolver
 {

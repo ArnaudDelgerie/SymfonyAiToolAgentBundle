@@ -1,10 +1,10 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;

@@ -1,17 +1,17 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
 use RuntimeException;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\MessageRoleEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\Enum\MessageRoleEnum;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ClientResolver;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Resolver\ToolFunctionResolver;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ToolFunctionManagerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
+use ArnaudDelgerie\AiToolAgent\Resolver\ClientResolver;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
+use ArnaudDelgerie\AiToolAgent\Resolver\ToolFunctionResolver;
+use ArnaudDelgerie\AiToolAgent\Interface\ToolFunctionManagerInterface;
+use ArnaudDelgerie\AiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
 
 class ToolAgentHelper
 {

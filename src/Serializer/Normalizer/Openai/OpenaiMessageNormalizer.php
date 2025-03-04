@@ -1,10 +1,10 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Openai;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Normalizer\Openai;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageImage;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\MessageImage;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\DTO;
+namespace ArnaudDelgerie\AiToolAgent\DTO;
 
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Attribute\SerializedName;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
 
 class ToolFunctionProperty
 {
@@ -21,7 +21,7 @@ class ToolFunctionProperty
         expression: 'this.getType().value == "array"',
         constraints: [new Assert\NotBlank(message: 'This value should not be blank when "type" === "array"')],
     )]
-    private ?ToolFunctionProperty $arrayProperty = null;
+    private ?ToolFunctionProperty $arrayItemProperty = null;
 
     #[SerializedName('properties')]
     #[Assert\When(
@@ -66,14 +66,14 @@ class ToolFunctionProperty
         return $this;
     }
 
-    public function getArrayProperty(): ?ToolFunctionProperty
+    public function getArrayItemProperty(): ?ToolFunctionProperty
     {
-        return $this->arrayProperty;
+        return $this->arrayItemProperty;
     }
 
-    public function setArrayProperty(?ToolFunctionProperty $arrayProperty): static
+    public function setArrayItemProperty(?ToolFunctionProperty $arrayItemProperty): static
     {
-        $this->arrayProperty = $arrayProperty;
+        $this->arrayItemProperty = $arrayItemProperty;
 
         return $this;
     }

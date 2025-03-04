@@ -1,9 +1,9 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Denormalizer\Openai;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Denormalizer\Openai;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 

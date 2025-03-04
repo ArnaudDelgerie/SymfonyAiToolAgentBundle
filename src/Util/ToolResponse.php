@@ -1,11 +1,11 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
 class ToolResponse
 {
     public function __construct(
-        public array  $context,
+        public array  $responseContent,
         public string $message = 'Task completed',
         public bool   $stopRun = false,
     ) {}

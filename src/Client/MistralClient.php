@@ -1,15 +1,15 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Client;
+namespace ArnaudDelgerie\AiToolAgent\Client;
 
 use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientConfig;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientHelper;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientResponse;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentUsageReport;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\Util\ClientConfig;
+use ArnaudDelgerie\AiToolAgent\Util\ClientHelper;
+use ArnaudDelgerie\AiToolAgent\Util\ClientResponse;
+use ArnaudDelgerie\AiToolAgent\Util\AgentUsageReport;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
 class MistralClient implements ClientInterface

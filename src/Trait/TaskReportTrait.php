@@ -1,6 +1,6 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Trait;
+namespace ArnaudDelgerie\AiToolAgent\Trait;
 
 trait TaskReportTrait
 {

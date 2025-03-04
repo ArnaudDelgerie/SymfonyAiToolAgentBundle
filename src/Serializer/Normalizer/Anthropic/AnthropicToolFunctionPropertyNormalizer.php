@@ -1,12 +1,12 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Anthropic;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Normalizer\Anthropic;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunctionProperty;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunctionProperty;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
 
 class AnthropicToolFunctionPropertyNormalizer implements NormalizerInterface
 {

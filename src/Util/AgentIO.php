@@ -1,6 +1,6 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
 

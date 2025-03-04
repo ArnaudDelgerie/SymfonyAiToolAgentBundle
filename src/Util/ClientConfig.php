@@ -1,8 +1,8 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
 
 class ClientConfig
 {

@@ -1,18 +1,15 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\ToolFunctionManager;
+namespace ArnaudDelgerie\AiToolAgent\ToolFunctionManager;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolResponse;
-use ArnaudDelgerie\SymfonyAiToolAgent\Trait\TaskReportTrait;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunctionProperty;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ToolFunctionManagerInterface;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\Util\ToolResponse;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunctionProperty;
+use ArnaudDelgerie\AiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
+use ArnaudDelgerie\AiToolAgent\Interface\ToolFunctionManagerInterface;
 
 class TasksCompletedToolFunctionManager implements ToolFunctionManagerInterface
 {
-    use TaskReportTrait;
-
     public static function getName(): string
     {
         return 'tasks_completed';
@@ -29,10 +26,10 @@ class TasksCompletedToolFunctionManager implements ToolFunctionManagerInterface
         );
     }
 
-    public function execute(array $args, array $context): ToolResponse
+    public function execute(array $args, array $context, array $response): ToolResponse
     {
-        $context = $this->updateTaskReport($context, self::getName(), $args);
+        $response[self::getName()] = $args['TasksSummary'];
 
-        return new ToolResponse($context, "OK", true);
+        return new ToolResponse($response, "", true);
     }
 }

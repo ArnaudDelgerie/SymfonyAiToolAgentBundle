@@ -1,19 +1,19 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Agent;
+namespace ArnaudDelgerie\AiToolAgent\Agent;
 
 use RuntimeException;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopStepEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ClientConfig;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentResponse;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCall;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\StopReasonEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\MessageRoleEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentStopReport;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolAgentHelper;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentUsageReport;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ClientInterface;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\Enum\StopStepEnum;
+use ArnaudDelgerie\AiToolAgent\Util\ClientConfig;
+use ArnaudDelgerie\AiToolAgent\Util\AgentResponse;
+use ArnaudDelgerie\AiToolAgent\DTO\MessageToolCall;
+use ArnaudDelgerie\AiToolAgent\Enum\StopReasonEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\MessageRoleEnum;
+use ArnaudDelgerie\AiToolAgent\Util\AgentStopReport;
+use ArnaudDelgerie\AiToolAgent\Util\ToolAgentHelper;
+use ArnaudDelgerie\AiToolAgent\Util\AgentUsageReport;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
 
 class ToolAgent
 {
@@ -27,12 +27,16 @@ class ToolAgent
 
     private int $nbRequest = 0;
 
+    private array $responseContent = [];
+
+    private AgentUsageReport $usageReport;
+
     public function __construct(
         private ToolAgentHelper  $toolAgentHelper,
         private ClientConfig     $clientConfig,
         private array            $context,
-        private AgentUsageReport $usageReport,
     ) {
+        $this->usageReport = new AgentUsageReport();
         $this->clientConfig->toolOnly = true;
         $this->client = $this->toolAgentHelper->getClient($this->clientConfig);
     }
@@ -70,9 +74,9 @@ class ToolAgent
             $arguments = $toolCall->getFunction()->getArguments();
 
             $toolFunctionManager = $this->toolAgentHelper->getToolFunctionManager($functionName);
-            $response = $toolFunctionManager->execute($arguments, $this->context);
+            $response = $toolFunctionManager->execute($arguments, $this->context, $this->responseContent);
 
-            $this->context = $response->context;
+            $this->responseContent = $response->responseContent;
             $this->messages[] = (new Message())
                 ->setRole(MessageRoleEnum::Tool)
                 ->setContent($response->message)
@@ -82,7 +86,7 @@ class ToolAgent
             if ($response->stopRun) {
                 $this->initialized = false;
                 $stopReport = new AgentStopReport(StopReasonEnum::Function, $functionName, StopStepEnum::Execute);
-                return new AgentResponse($stopReport, $this->usageReport, $this->context);
+                return new AgentResponse($stopReport, $this->usageReport, $this->responseContent);
             }
         }
 
@@ -91,7 +95,7 @@ class ToolAgent
             return $this->run();
         }
 
-        $stopReport = new AgentStopReport(StopReasonEnum::RequestLimit, (string) $this->nbRequest);
-        return new AgentResponse($stopReport, $this->usageReport, $this->context);
+        $stopReport = new AgentStopReport(StopReasonEnum::RequestLimit, $this->nbRequest);
+        return new AgentResponse($stopReport, $this->usageReport, $this->responseContent);
     }
 }

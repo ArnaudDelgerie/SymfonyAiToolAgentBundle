@@ -1,10 +1,10 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Denormalizer\Mistral;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Denormalizer\Mistral;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCallFunction;
+use ArnaudDelgerie\AiToolAgent\DTO\MessageToolCallFunction;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class MistralMessageToolCallFunctionDenormalizer implements DenormalizerInterface

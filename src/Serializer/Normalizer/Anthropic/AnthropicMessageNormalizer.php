@@ -1,12 +1,12 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Anthropic;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Normalizer\Anthropic;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageImage;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCall;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\MessageRoleEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\DTO\MessageImage;
+use ArnaudDelgerie\AiToolAgent\DTO\MessageToolCall;
+use ArnaudDelgerie\AiToolAgent\Enum\MessageRoleEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

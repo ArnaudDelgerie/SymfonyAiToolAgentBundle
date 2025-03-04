@@ -1,20 +1,17 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\ToolFunctionManager;
+namespace ArnaudDelgerie\AiToolAgent\ToolFunctionManager;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentIO;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolResponse;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolValidation;
-use ArnaudDelgerie\SymfonyAiToolAgent\Trait\TaskReportTrait;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunctionProperty;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
-use ArnaudDelgerie\SymfonyAiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
+use ArnaudDelgerie\AiToolAgent\Util\AgentIO;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\Util\ToolResponse;
+use ArnaudDelgerie\AiToolAgent\Util\ToolValidation;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunctionProperty;
+use ArnaudDelgerie\AiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
+use ArnaudDelgerie\AiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
 
 class ConsoleTasksCompletedToolFunctionManager implements ConsoleToolFunctionManagerInterface
 {
-    use TaskReportTrait;
-
     public static function getName(): string
     {
         return 'tasks_completed';
@@ -31,16 +28,16 @@ class ConsoleTasksCompletedToolFunctionManager implements ConsoleToolFunctionMan
         );
     }
 
-    public function validate(array $args, array $context, AgentIO $agentIO): ToolValidation
+    public function validate(array $args, array $context, array $responseContent, AgentIO $agentIO): ToolValidation
     {
-        return new ToolValidation($args, $context);
+        return new ToolValidation($args, $responseContent);
     }
 
-    public function execute(array $args, array $context, AgentIO $agentIO): ToolResponse
+    public function execute(array $args, array $context, array $responseContent, AgentIO $agentIO): ToolResponse
     {
-        $context = $this->updateTaskReport($context, self::getName(), $args);
+        $responseContent[self::getName()] = $args['TasksSummary'];
         $agentIO->text($args['TasksSummary']);
 
-        return new ToolResponse($context, "OK", true);
+        return new ToolResponse($responseContent, "OK", true);
     }
 }

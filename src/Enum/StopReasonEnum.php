@@ -1,6 +1,6 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Enum;
+namespace ArnaudDelgerie\AiToolAgent\Enum;
 
 enum StopReasonEnum
 {

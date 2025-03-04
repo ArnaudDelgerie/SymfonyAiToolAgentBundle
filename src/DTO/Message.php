@@ -1,12 +1,12 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\DTO;
+namespace ArnaudDelgerie\AiToolAgent\DTO;
 
 use RuntimeException;
 use Symfony\Component\Serializer\Annotation\Ignore;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\MessageToolCall;
+use ArnaudDelgerie\AiToolAgent\DTO\MessageToolCall;
 use Symfony\Component\Serializer\Attribute\SerializedName;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\MessageRoleEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\MessageRoleEnum;
 
 class Message
 {

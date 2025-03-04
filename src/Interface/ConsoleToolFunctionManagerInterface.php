@@ -1,11 +1,11 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Interface;
+namespace ArnaudDelgerie\AiToolAgent\Interface;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\AgentIO;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunction;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolResponse;
-use ArnaudDelgerie\SymfonyAiToolAgent\Util\ToolValidation;
+use ArnaudDelgerie\AiToolAgent\Util\AgentIO;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
+use ArnaudDelgerie\AiToolAgent\Util\ToolResponse;
+use ArnaudDelgerie\AiToolAgent\Util\ToolValidation;
 
 interface ConsoleToolFunctionManagerInterface
 {
@@ -13,7 +13,7 @@ interface ConsoleToolFunctionManagerInterface
 
     public function getToolFunction(array $context): ToolFunction;
 
-    public function validate(array $args, array $context, AgentIO $agentIO): ToolValidation;
+    public function validate(array $args, array $context, array $responseContent, AgentIO $agentIO): ToolValidation;
 
-    public function execute(array $args, array $context, AgentIO $agentIO): ToolResponse;
+    public function execute(array $args, array $context, array $responseContent, AgentIO $agentIO): ToolResponse;
 }

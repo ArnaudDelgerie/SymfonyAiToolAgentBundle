@@ -1,8 +1,8 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Util;
+namespace ArnaudDelgerie\AiToolAgent\Util;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\Message;
+use ArnaudDelgerie\AiToolAgent\DTO\Message;
 
 class ClientResponse
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace ArnaudDelgerie\SymfonyAiToolAgent\Serializer\Normalizer\Openai;
+namespace ArnaudDelgerie\AiToolAgent\Serializer\Normalizer\Openai;
 
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ClientEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use ArnaudDelgerie\SymfonyAiToolAgent\DTO\ToolFunctionProperty;
+use ArnaudDelgerie\AiToolAgent\DTO\ToolFunctionProperty;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ArnaudDelgerie\SymfonyAiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
+use ArnaudDelgerie\AiToolAgent\Enum\ToolFunctionPropertyTypeEnum;
 
 class OpenaiToolFunctionPropertyNormalizer implements NormalizerInterface
 {
