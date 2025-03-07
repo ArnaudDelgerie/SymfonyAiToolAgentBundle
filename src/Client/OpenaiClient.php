@@ -5,16 +5,16 @@ namespace ArnaudDelgerie\AiToolAgent\Client;
 use RuntimeException;
 use Symfony\Component\HttpClient\HttpClient;
 use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\AiToolAgent\Util\ClientConfig;
 use ArnaudDelgerie\AiToolAgent\Util\ClientHelper;
 use ArnaudDelgerie\AiToolAgent\Util\ClientResponse;
 use ArnaudDelgerie\AiToolAgent\Util\AgentUsageReport;
 use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientConfigInterface;
 use \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
 class OpenaiClient implements ClientInterface
 {
-    private ?ClientConfig $config = null;
+    private ?ClientConfigInterface $config = null;
 
     public function __construct(private ClientHelper $clientHelper) {}
 
@@ -23,30 +23,30 @@ class OpenaiClient implements ClientInterface
         return ClientEnum::Openai;
     }
 
-    public function setConfig(ClientConfig $config): void
+    public function setConfig(ClientConfigInterface $config): void
     {
         $this->config = $config;
     }
 
     public function chat(array  $messages, array  $tools = []): ClientResponse
     {
-        if (!$this->config instanceof ClientConfig) {
-            throw new RuntimeException('OpenaiClient::config must be an instance of ClientCongig');
+        if (!$this->config instanceof ClientConfigInterface) {
+            throw new RuntimeException('OpenaiClient::config must be an instance of ' . ClientConfigInterface::class);
         }
 
-        $client = HttpClient::create(['timeout' => $this->config->timeout]);
+        $client = HttpClient::create(['timeout' => $this->config->getTimeout()]);
         $response = $client->request('POST', 'https://api.openai.com/v1/chat/completions', [
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . $this->config->apiKey,
+                'Authorization' => 'Bearer ' . $this->config->getApiKey(),
             ],
             'json' => [
-                'model' => $this->config->model,
-                'temperature' => $this->config->temperature,
+                'model' => $this->config->getModel(),
+                'temperature' => $this->config->getTemperature(),
                 'messages' => $this->clientHelper->normalizeMessages($this->getClientEnum(), $messages),
                 'tools' => $this->clientHelper->normalizeTools($this->getClientEnum(), $tools),
-                'tool_choice' => $this->config->toolOnly ? 'required' : 'auto'
+                'tool_choice' => 'required',
             ],
         ]);
 

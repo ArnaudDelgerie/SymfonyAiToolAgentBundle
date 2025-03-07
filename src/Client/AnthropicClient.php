@@ -3,19 +3,19 @@
 namespace ArnaudDelgerie\AiToolAgent\Client;
 
 use RuntimeException;
-use Symfony\Component\HttpClient\HttpClient;
 use ArnaudDelgerie\AiToolAgent\DTO\Message;
+use Symfony\Component\HttpClient\HttpClient;
 use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
-use ArnaudDelgerie\AiToolAgent\Util\ClientConfig;
 use ArnaudDelgerie\AiToolAgent\Util\ClientHelper;
 use ArnaudDelgerie\AiToolAgent\Util\ClientResponse;
 use ArnaudDelgerie\AiToolAgent\Util\AgentUsageReport;
 use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientConfigInterface;
 use \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
 class AnthropicClient implements ClientInterface
 {
-    private ?ClientConfig $config = null;
+    private ?ClientConfigInterface $config = null;
 
     public function __construct(private ClientHelper $clientHelper) {}
 
@@ -24,35 +24,35 @@ class AnthropicClient implements ClientInterface
         return ClientEnum::Anthropic;
     }
 
-    public function setConfig(ClientConfig $config): void
+    public function setConfig(ClientConfigInterface $config): void
     {
         $this->config = $config;
     }
 
     public function chat(array  $messages, array  $tools = []): ClientResponse
     {
-        if (!$this->config instanceof ClientConfig) {
-            throw new RuntimeException('AnthropicClient::config must be an instance of ClientCongig');
+        if (!$this->config instanceof ClientConfigInterface) {
+            throw new RuntimeException('AnthropicClient::config must be an instance of ' . ClientConfigInterface::class);
         }
 
         /** @var Message $sysMessage */
         $sysMessage = array_shift($messages);
 
-        $client = HttpClient::create(['timeout' => $this->config->timeout]);
+        $client = HttpClient::create(['timeout' => $this->config->getTimeout()]);
         $response = $client->request('POST', 'https://api.anthropic.com/v1/messages', [
             'headers' => [
                 'content-type' => 'application/json',
                 'anthropic-version' => '2023-06-01',
-                'x-api-key' => $this->config->apiKey,
+                'x-api-key' => $this->config->getApiKey(),
             ],
             'json' => [
-                'model' => $this->config->model,
-                'temperature' => $this->config->temperature,
+                'model' => $this->config->getModel(),
+                'temperature' => $this->config->getTemperature(),
                 'max_tokens' => 8192,
                 'system' => $sysMessage->getContent(),
                 'messages' => $this->clientHelper->normalizeMessages($this->getClientEnum(), $messages),
                 'tools' => $this->clientHelper->normalizeTools($this->getClientEnum(), $tools),
-                'tool_choice' => ['type' => $this->config->toolOnly ? 'any' : 'auto', 'disable_parallel_tool_use' => false]
+                'tool_choice' => ['type' => 'any', 'disable_parallel_tool_use' => false],
             ],
         ]);
 

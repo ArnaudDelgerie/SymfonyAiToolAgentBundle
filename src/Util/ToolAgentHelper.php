@@ -6,10 +6,11 @@ use RuntimeException;
 use ArnaudDelgerie\AiToolAgent\DTO\Message;
 use ArnaudDelgerie\AiToolAgent\DTO\ToolFunction;
 use ArnaudDelgerie\AiToolAgent\Enum\MessageRoleEnum;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use ArnaudDelgerie\AiToolAgent\Resolver\ClientResolver;
 use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
 use ArnaudDelgerie\AiToolAgent\Resolver\ToolFunctionResolver;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientConfigInterface;
 use ArnaudDelgerie\AiToolAgent\Interface\ToolFunctionManagerInterface;
 use ArnaudDelgerie\AiToolAgent\Interface\ConsoleToolFunctionManagerInterface;
 
@@ -21,7 +22,7 @@ class ToolAgentHelper
         private ValidatorInterface   $validator,
     ) {}
 
-    public function getClient(ClientConfig $clientConfig): ClientInterface
+    public function getClient(ClientConfigInterface $clientConfig): ClientInterface
     {
         return $this->clientResolver->getClient($clientConfig);
     }

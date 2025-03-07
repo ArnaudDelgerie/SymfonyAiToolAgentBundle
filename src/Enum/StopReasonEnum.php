@@ -6,7 +6,5 @@ enum StopReasonEnum
 {
     case Function;
 
-    case Command;
-
     case RequestLimit;
 }

@@ -6,22 +6,24 @@ use RuntimeException;
 use ArnaudDelgerie\AiToolAgent\DTO\Message;
 use ArnaudDelgerie\AiToolAgent\Util\AgentIO;
 use ArnaudDelgerie\AiToolAgent\Enum\StopStepEnum;
-use ArnaudDelgerie\AiToolAgent\Util\ClientConfig;
 use ArnaudDelgerie\AiToolAgent\Util\AgentResponse;
 use ArnaudDelgerie\AiToolAgent\DTO\MessageToolCall;
 use ArnaudDelgerie\AiToolAgent\Enum\StopReasonEnum;
 use ArnaudDelgerie\AiToolAgent\Enum\MessageRoleEnum;
 use ArnaudDelgerie\AiToolAgent\Util\AgentStopReport;
 use ArnaudDelgerie\AiToolAgent\Util\ToolAgentHelper;
-use ArnaudDelgerie\AiToolAgent\Util\AgentStopCommand;
 use ArnaudDelgerie\AiToolAgent\Util\AgentUsageReport;
 use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
+use ArnaudDelgerie\AiToolAgent\Interface\AgentConfigInterface;
+use ArnaudDelgerie\AiToolAgent\Interface\ClientConfigInterface;
 
 class ConsoleToolAgent
 {
     private bool $usageLog = true;
 
-    private array $stopCommands = [];
+    private ClientConfigInterface $clientConfig;
+
+    private AgentConfigInterface $agentConfig;
 
     private ClientInterface $client;
 
@@ -29,78 +31,46 @@ class ConsoleToolAgent
 
     private array $messages;
 
-    private bool $initialized = false;
-
     private int $nbRequest = 0;
 
-    private bool $userPromptRequired = true;
+    private bool $userMessageRequired = true;
 
     private array $responseContent = [];
 
     private AgentUsageReport $usageReport;
 
     public function __construct(
-        private ToolAgentHelper  $toolAgentHelper,
-        private ClientConfig     $clientConfig,
-        private array            $context,
+        private ToolAgentHelper $toolAgentHelper,
+        ClientConfigInterface   $clientConfig,
+        AgentConfigInterface    $agentConfig,
     ) {
         $this->usageReport = new AgentUsageReport();
-        $this->client = $this->toolAgentHelper->getClient($this->clientConfig);
+        $this->updateClientConfig($clientConfig);
+        $this->updateAgentConfig($agentConfig);
     }
 
-    public function init(array $functionNames, string $sysPrompt, ?string $userPrompt = null): static 
+    public function addUserMessage(string $userPrompt): static
     {
-        $this->toolFunctions = $this->toolAgentHelper->getConsoleToolFunctions($functionNames, $this->context);
-        $this->messages = [$this->toolAgentHelper->getMessage(MessageRoleEnum::System, $sysPrompt)];
-        if ($userPrompt) {
-            $this->userPromptRequired = false;
-            $this->messages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt);
-        }
-        $this->initialized = true;
+        $this->nbRequest = 0;
+        $this->userMessageRequired = false;
+        $this->messages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt);
 
         return $this;
     }
 
-    public function run(AgentIO $agentIO, ?string $question = 'What would you like to do ?'): AgentResponse
+    public function run(AgentIO $agentIO): AgentResponse
     {
-        if (false === $this->initialized) {
-            throw new RuntimeException('ConsoleToolAgent: "run" method cannot be called before "init" method');
-        }
-
-        if ($this->userPromptRequired) {
-            $this->nbRequest = 0;
-            if (count($this->stopCommands) > 0) {
-                $finalQuestion = $question . ' (you can also enter ? to see availables commands)';
-            }
-            $userPrompt = $agentIO->ask($finalQuestion ?? $question);
-            if (count($this->stopCommands) > 0 && $userPrompt === '?') {
-                $agentIO->showAvailablesCommands($this->stopCommands);
-                return $this->run($agentIO, $question);
-            }
-            if (null === $userPrompt || $this->isStopCommand($userPrompt)) {
-                $stopReport = new AgentStopReport(StopReasonEnum::Command, $userPrompt ?? '');
-                return new AgentResponse($stopReport, $this->usageReport, $this->responseContent);
-            }
-            $this->messages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::User, $userPrompt);
-            $this->userPromptRequired = false;
+        if (true === $this->userMessageRequired) {
+            throw new RuntimeException('ConsoleToolAgent: "run" method cannot be called before "addUserMessage" method');
         }
 
         $clientResponse = $this->client->chat($this->messages, $this->toolFunctions);
+
         $this->usageReport->merge($clientResponse->usageReport);
-        $assistantMessage = $clientResponse->message;
-
-        if ($this->usageLog) {
-            $agentIO->logUsage($this->usageReport);
-        }
-
-        if (null === $assistantMessage->getToolCalls() || count($assistantMessage->getToolCalls()) === 0) {
-            $this->messages[] = $assistantMessage;
-            $this->userPromptRequired = true;
-            $agentIO->text($assistantMessage->getContent());
-            return $this->run($agentIO, $question);
-        }
+        if ($this->usageLog) $agentIO->logUsage($this->usageReport);
 
         $completedToolCalls = $toolMessages = [];
+        $assistantMessage = $clientResponse->message;
         /** @var MessageToolCall $toolCall */
         foreach ($assistantMessage->getToolCalls() as $toolCall) {
             $completedToolCalls[] = $toolCall;
@@ -108,7 +78,7 @@ class ConsoleToolAgent
             $args = $toolCall->getFunction()->getArguments();
 
             $toolFunctionManager = $this->toolAgentHelper->getConsoleToolFunctionManager($functionName);
-            $validation = $toolFunctionManager->validate($args, $this->context, $this->responseContent, $agentIO);
+            $validation = $toolFunctionManager->validate($args, $this->agentConfig->getContext(), $this->responseContent, $agentIO);
 
             $args = $validation->args;
             $this->responseContent = $validation->responseContent;
@@ -123,7 +93,7 @@ class ConsoleToolAgent
                     break;
                 }
             } else {
-                $response = $toolFunctionManager->execute($args, $this->context, $this->responseContent, $agentIO);
+                $response = $toolFunctionManager->execute($args, $this->agentConfig->getContext(), $this->responseContent, $agentIO);
                 $this->responseContent = $response->responseContent;
                 $toolMessages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::Tool, $response->message, $functionName, $toolCall->getId());
                 if ($response->stopRun) {
@@ -134,27 +104,27 @@ class ConsoleToolAgent
         }
 
         $this->nbRequest = $this->nbRequest + 1;
-        if ($this->nbRequest < $this->clientConfig->requestLimit) {
+        if ($this->nbRequest < $this->clientConfig->getRequestLimit()) {
             $this->messages = array_merge($this->messages, [$assistantMessage], $toolMessages);
-            return $this->run($agentIO, $question);
+            return $this->run($agentIO);
         }
 
-        $agentIO->alert('Request limit reached');
-        $assistantMessage->setToolCalls($completedToolCalls);
         return $this->toolStop($toolMessages, $assistantMessage, StopReasonEnum::RequestLimit, $this->nbRequest);
     }
 
-    public function updateClientConfig(ClientConfig $clientConfig): static
+    public function updateClientConfig(ClientConfigInterface $clientConfig): static
     {
         $this->clientConfig = $clientConfig;
-        $this->client->setConfig($clientConfig);
+        $this->client = $this->toolAgentHelper->getClient($clientConfig);
 
         return $this;
     }
 
-    public function updateToolFunctions(array $functionNames): static
+    public function updateAgentConfig(AgentConfigInterface $agentConfig): static
     {
-        $this->toolFunctions = $this->toolAgentHelper->getConsoleToolFunctions($functionNames, $this->context);
+        $this->agentConfig = $agentConfig;
+        $this->messages = [$this->toolAgentHelper->getMessage(MessageRoleEnum::System, $agentConfig->getSystemPrompt())];
+        $this->toolFunctions = $this->toolAgentHelper->getConsoleToolFunctions($agentConfig->getFunctionNames(), $agentConfig->getContext());
 
         return $this;
     }
@@ -166,39 +136,12 @@ class ConsoleToolAgent
         return $this;
     }
 
-    public function setStopCommands(array $stopCommands): static
-    {
-        foreach ($stopCommands as $stopCommand) {
-            if (!$stopCommand instanceof AgentStopCommand) {
-                throw new RuntimeException('setStopCommands: $stopCommands must be an array of ' . AgentStopCommand::class);
-            }
-            if ($stopCommand->word === '?') {
-                throw new RuntimeException('setStopCommands: "?" is a reserved AgentStopCommand->word');
-            }
-        }
-
-        $this->stopCommands = $stopCommands;
-
-        return $this;
-    }
-
     private function toolStop(array $toolMessages, Message $assistantMessage, StopReasonEnum $stopReason, string $stopValue, ?StopStepEnum $stopReasonStep = null): AgentResponse
     {
-        $this->userPromptRequired = true;
-        $toolMessages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::Assistant, 'All tasks are completed, what would you like to do?');
+        $this->userMessageRequired = true;
+        $toolMessages[] = $this->toolAgentHelper->getMessage(MessageRoleEnum::Assistant, 'What would you like to do?');
         $this->messages = array_merge($this->messages, [$assistantMessage], $toolMessages);
         $stopReport = new AgentStopReport($stopReason, $stopValue, $stopReasonStep);
         return new AgentResponse($stopReport, $this->usageReport, $this->responseContent);
-    }
-
-    private function isStopCommand(string $command): bool
-    {
-        /** @var AgentStopCommand $stopWord */
-        foreach ($this->stopCommands as $stopCommand) {
-            if ($command === $stopCommand->word) {
-                return true;
-            }
-        }
-        return false;
     }
 }
