@@ -2,16 +2,16 @@
 
 namespace ArnaudDelgerie\AiToolAgent\Client;
 
-use RuntimeException;
 use ArnaudDelgerie\AiToolAgent\DTO\Message;
 use Symfony\Component\HttpClient\HttpClient;
 use ArnaudDelgerie\AiToolAgent\Enum\ClientEnum;
 use ArnaudDelgerie\AiToolAgent\Util\ClientHelper;
 use ArnaudDelgerie\AiToolAgent\Util\ClientResponse;
 use ArnaudDelgerie\AiToolAgent\Util\AgentUsageReport;
+use ArnaudDelgerie\AiToolAgent\Exception\ClientException;
 use ArnaudDelgerie\AiToolAgent\Interface\ClientInterface;
 use ArnaudDelgerie\AiToolAgent\Interface\ClientConfigInterface;
-use \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 
 class AnthropicClient implements ClientInterface
 {
@@ -31,10 +31,6 @@ class AnthropicClient implements ClientInterface
 
     public function chat(array  $messages, array  $tools = []): ClientResponse
     {
-        if (!$this->config instanceof ClientConfigInterface) {
-            throw new RuntimeException('AnthropicClient::config must be an instance of ' . ClientConfigInterface::class);
-        }
-
         /** @var Message $sysMessage */
         $sysMessage = array_shift($messages);
 
@@ -48,7 +44,7 @@ class AnthropicClient implements ClientInterface
             'json' => [
                 'model' => $this->config->getModel(),
                 'temperature' => $this->config->getTemperature(),
-                'max_tokens' => 8192,
+                'max_tokens' => $this->config->getMaxOutputToken(),
                 'system' => $sysMessage->getContent(),
                 'messages' => $this->clientHelper->normalizeMessages($this->getClientEnum(), $messages),
                 'tools' => $this->clientHelper->normalizeTools($this->getClientEnum(), $tools),
@@ -59,7 +55,7 @@ class AnthropicClient implements ClientInterface
         try {
             $response = $response->toArray();
         } catch (ClientExceptionInterface $e) {
-            throw $e;
+            throw new ClientException($response->getContent(false), $response->getStatusCode());
         }
 
         $message = $this->clientHelper->denormalizeMessage($this->getClientEnum(), ['role' => $response['role'], 'content' => $response['content']]);

@@ -86,7 +86,7 @@ class ToolAgent
         }
 
         $this->nbRequest = $this->nbRequest + 1;
-        if ($this->nbRequest < $this->clientConfig->getRequestLimit()) {
+        if (null === $this->clientConfig->getRequestLimit() || $this->nbRequest < $this->clientConfig->getRequestLimit()) {
             $this->messages = array_merge($this->messages, [$assistantMessage], $toolMessages);
             return $this->run();
         }
@@ -107,7 +107,7 @@ class ToolAgent
         $this->userMessageRequired = true;
         $this->agentConfig = $agentConfig;
         $this->messages = [$this->toolAgentHelper->getMessage(MessageRoleEnum::System, $agentConfig->getSystemPrompt())];
-        $this->toolFunctions = $this->toolAgentHelper->getConsoleToolFunctions($agentConfig->getFunctionNames(), $agentConfig->getContext());
+        $this->toolFunctions = $this->toolAgentHelper->getToolFunctions($agentConfig->getFunctionNames(), $agentConfig->getContext());
 
         return $this;
     }

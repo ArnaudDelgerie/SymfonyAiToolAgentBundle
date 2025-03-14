@@ -14,7 +14,9 @@ interface ClientConfigInterface
 
     public function getTemperature(): float;
 
-    public function getRequestLimit(): int;
+    public function getRequestLimit(): ?int;
 
     public function getTimeout(): int;
+
+    public function getMaxOutputToken(): int;
 }

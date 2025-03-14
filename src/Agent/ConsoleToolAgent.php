@@ -19,7 +19,7 @@ use ArnaudDelgerie\AiToolAgent\Interface\ClientConfigInterface;
 
 class ConsoleToolAgent
 {
-    private bool $usageLog = true;
+    private bool $usageLog = false;
 
     private ClientConfigInterface $clientConfig;
 
@@ -104,11 +104,12 @@ class ConsoleToolAgent
         }
 
         $this->nbRequest = $this->nbRequest + 1;
-        if ($this->nbRequest < $this->clientConfig->getRequestLimit()) {
+        if (null === $this->clientConfig->getRequestLimit() || $this->nbRequest < $this->clientConfig->getRequestLimit()) {
             $this->messages = array_merge($this->messages, [$assistantMessage], $toolMessages);
             return $this->run($agentIO);
         }
 
+        $agentIO->alert('Request limit reached');
         return $this->toolStop($toolMessages, $assistantMessage, StopReasonEnum::RequestLimit, $this->nbRequest);
     }
 

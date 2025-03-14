@@ -2,7 +2,7 @@
     "name": "arnaud-delgerie/symfony-ai-tool-agent",
     "type": "symfony-bundle",
     "license": "MIT",
-    "keywords": ["ai", "tool-function", "openai", "mistral", "agent"],
+    "keywords": ["ai", "llm", "tool-function", "openai", "mistral", "anthropic", "agent"],
     "authors": [
         {
             "name": "arnaud",
@@ -18,17 +18,12 @@
         "symfony/dependency-injection": "^6.4|^7.0",
         "symfony/deprecation-contracts": "^2.2|^3",
         "symfony/framework-bundle": "^6.4|^7.0",
+        "symfony/http-client": "^6.4|^7.0",
         "symfony/http-kernel": "^6.4|^7.0",
         "symfony/process": "^6.4|^7.0",
         "symfony/serializer": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0",
         "symfony/serializer-pack": "^1.3"
-    },
-    "require-dev": {
-        "symfony/http-client": "^7.0",
-        "symfony/phpunit-bridge": "^7.0",
-        "symfony/security-core": "^7.0",
-        "symfony/yaml": "^7.0"
     },
     "autoload": {
         "psr-4": {

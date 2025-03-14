@@ -11,9 +11,10 @@ class ClientConfig implements ClientConfigInterface
         private ClientEnum $clientEnum,
         private string     $apiKey,
         private string     $model,
-        private float      $temperature = 0.5,
-        private int        $requestLimit = 10,
+        private float      $temperature = 1.0,
+        private ?int       $requestLimit = null,
         private int        $timeout = 60,
+        private int        $maxOutputToken = 8192,
     ) {}
 
     public function getClientEnum(): ClientEnum
@@ -36,7 +37,7 @@ class ClientConfig implements ClientConfigInterface
         return $this->temperature;
     }
 
-    public function getRequestLimit(): int
+    public function getRequestLimit(): ?int
     {
         return $this->requestLimit;
     }
@@ -44,5 +45,10 @@ class ClientConfig implements ClientConfigInterface
     public function getTimeout(): int
     {
         return $this->timeout;
+    }
+
+    public function getMaxOutputToken(): int
+    {
+        return $this->maxOutputToken;
     }
 }

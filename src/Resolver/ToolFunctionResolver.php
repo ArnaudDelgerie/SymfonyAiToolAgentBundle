@@ -39,6 +39,10 @@ class ToolFunctionResolver
      */
     public function getToolFunctions(array $names, array $contextData): array
     {
+        if (0 === count($names)) {
+            throw new RuntimeException('You must provide at least one function name');
+        }
+
         $toolFunctions = [];
         /** @var ToolFunctionManagerInterface $toolFunctionManager */
         foreach ($this->toolFunctionManagers as $toolFunctionManager) {
@@ -47,8 +51,8 @@ class ToolFunctionResolver
             }
         }
 
-        if (0 === count($toolFunctions)) {
-            throw new RuntimeException('No toolFunction found for names ' . implode(', ', $names));            
+        if (count($names) !== count($toolFunctions)) {
+            throw new RuntimeException('3 function names provided, 2 functions found');            
         }
 
         return $toolFunctions;
@@ -59,6 +63,10 @@ class ToolFunctionResolver
      */
     public function getConsoleToolFunctions(array $names, array $contextData): array
     {
+        if (0 === count($names)) {
+            throw new RuntimeException('You must provide at least one function name');
+        }
+
         $toolFunctions = [];
         /** @var ConsoleToolFunctionManagerInterface $toolFunctionManager */
         foreach ($this->consoleToolFunctionManagers as $toolFunctionManager) {
@@ -67,8 +75,8 @@ class ToolFunctionResolver
             }
         }
 
-        if (0 === count($toolFunctions)) {
-            throw new RuntimeException('No toolFunction found for names ' . implode(', ', $names));            
+        if (count($names) !== count($toolFunctions)) {
+            throw new RuntimeException('3 function names provided, 2 functions found');            
         }
 
         return $toolFunctions;
