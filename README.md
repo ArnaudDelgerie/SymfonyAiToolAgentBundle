@@ -283,7 +283,6 @@ class TopicClassifier
         /*
         $response->content
         [
-          "availableTopics" => [the list of initial available topics],
           "topic_classification" => ["topic" => "technology", "prediction_confidence" => 10],
 		]
 		*/
