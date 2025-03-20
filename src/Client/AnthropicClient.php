@@ -46,7 +46,7 @@ class AnthropicClient implements ClientInterface
                 'temperature' => $this->config->getTemperature(),
                 'max_tokens' => $this->config->getMaxOutputToken(),
                 'system' => $sysMessage->getContent(),
-                'messages' => $this->clientHelper->normalizeMessages($this->getClientEnum(), $messages),
+                'messages' => $this->mergeUserMessage($this->clientHelper->normalizeMessages($this->getClientEnum(), $messages)),
                 'tools' => $this->clientHelper->normalizeTools($this->getClientEnum(), $tools),
                 'tool_choice' => ['type' => 'any', 'disable_parallel_tool_use' => false],
             ],
@@ -62,5 +62,25 @@ class AnthropicClient implements ClientInterface
         $usageReport = new AgentUsageReport(1, $response['usage']['input_tokens'], $response['usage']['output_tokens']);
 
         return new ClientResponse($message, $usageReport);
+    }
+
+    private function mergeUserMessage(array $messages): array
+    {
+        $mergedMessages = [];
+    
+        foreach ($messages as $message) {
+            $lastIndex = count($mergedMessages) - 1;
+    
+            if ($lastIndex >= 0 && $message['role'] === 'user' && $mergedMessages[$lastIndex]['role'] === 'user') {
+                $mergedMessages[$lastIndex]['content'] = array_merge(
+                    $mergedMessages[$lastIndex]['content'],
+                    $message['content']
+                );
+            } else {
+                $mergedMessages[] = $message;
+            }
+        }
+    
+        return $mergedMessages;
     }
 }

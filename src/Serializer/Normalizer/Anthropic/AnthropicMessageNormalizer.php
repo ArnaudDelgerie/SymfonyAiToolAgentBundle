@@ -39,8 +39,6 @@ class AnthropicMessageNormalizer implements NormalizerInterface
                     'input' => $toolCall->getFunction()->getArguments(),
                 ];
             }
-
-            $normalizedMessage['content'] = $messageContents;
         } elseif ($message->getRole() === MessageRoleEnum::Tool) {
             $normalizedMessage['role'] = 'user';
             $messageContents[] = [
