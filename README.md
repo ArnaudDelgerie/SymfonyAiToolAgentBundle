@@ -1,9 +1,11 @@
 # SymfonyAiToolAgentBundle Introduction
 
 ## Disclaimer
-- This bundle is in **alpha version**. If you use it in production, please check the `CHANGELOG.md` file before each version upgrade.
-- This bundle relies on third-party APIs (**Mistral, OpenAI, and Anthropic**). It is recommended to review their **Terms of Service** and **Data Protection Policies** before usage.
-- If you are not familiar with the concept of `tool function`, it is advised to get acquainted with it before using this bundle.
+- This bundle is currently in **alpha version**. If you plan to use it in production, please consult the `CHANGELOG.md` file before each update.
+- This project is developed for recreational purposes and may contain bugs or instabilities.
+- The bundle relies on third-party APIs (**Mistral, OpenAI, Anthropic**). It is strongly recommended to review their **Terms of Service** and **Data Protection Policies** before use.
+- If you are unfamiliar with the concept of `tool function`, please familiarize yourself with it before using this bundle.
+
 
 ## Overview
 This bundle enables the creation of AI agents based on the use of `tool function`. Two types of agents are available:
@@ -17,6 +19,7 @@ Since this bundle integrates third-party APIs, you need to create an account wit
 - **[Mistral](https://docs.mistral.ai/api/)** *(free plan available)*
 - **[Anthropic](https://www.anthropic.com/api)**
 
+**[SEE FULL DOC](https://github.com/ArnaudDelgerie/SymfonyAiToolAgentDoc)**
 
 ## Quickstart
 
@@ -260,7 +263,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class TopicClassifier
 {
     public function __construct(
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
         private TopicRepository        $topicRepo,
         private ParameterBagInterface  $params,
         private ToolAgentProvider      $toolAgentProvider
