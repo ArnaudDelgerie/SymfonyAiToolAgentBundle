@@ -52,7 +52,7 @@ class ToolFunctionResolver
         }
 
         if (count($names) !== count($toolFunctions)) {
-            throw new RuntimeException('3 function names provided, 2 functions found');            
+            throw new RuntimeException(count($names) . ' function names provided, ' . count($toolFunctions) . ' functions found');            
         }
 
         return $toolFunctions;
@@ -76,7 +76,7 @@ class ToolFunctionResolver
         }
 
         if (count($names) !== count($toolFunctions)) {
-            throw new RuntimeException('3 function names provided, 2 functions found');            
+            throw new RuntimeException(count($names) . ' function names provided, ' . count($toolFunctions) . ' functions found');            
         }
 
         return $toolFunctions;
